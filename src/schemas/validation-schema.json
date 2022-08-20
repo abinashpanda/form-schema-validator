@@ -25,7 +25,7 @@
       }
     }
   },
-  "required": ["id", "nameEnglish", "nameHindi"],
+  "required": ["id", "nameEnglish", "nameHindi", "forms"],
   "definitions": {
     "form": {
       "type": "object",
@@ -56,9 +56,16 @@
       "type": "object",
       "anyOf": [
         { "$ref": "#/definitions/text-field" },
+        { "$ref": "#/definitions/number-field" },
         { "$ref": "#/definitions/name-field" },
+        { "$ref": "#/definitions/mobile-field" },
         { "$ref": "#/definitions/image-uploader-field" },
-        { "$ref": "#/definitions/async-select-field" }
+        { "$ref": "#/definitions/async-select-field" },
+        { "$ref": "#/definitions/select-field" },
+        { "$ref": "#/definitions/async-radio-field" },
+        { "$ref": "#/definitions/radio-field" },
+        { "$ref": "#/definitions/date-field" },
+        { "$ref": "#/definitions/checkbox-field" }
       ],
       "properties": {
         "id": {
@@ -103,12 +110,12 @@
           "type": "string",
           "const": "name"
         },
-        "saluation": {
+        "salutation": {
           "type": "string",
           "enum": ["formal", "relation"]
         }
       },
-      "required": ["type", "saluation"]
+      "required": ["type", "salutation"]
     },
     "image-uploader-field": {
       "type": "object",
@@ -120,11 +127,27 @@
       },
       "required": ["type"]
     },
+    "select-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "select"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/option-field"
+          }
+        }
+      },
+      "required": ["type", "options"]
+    },
     "async-select-field": {
       "type": "object",
       "anyOf": [
-        { "$ref": "#/definitions/async-select-api-string" },
-        { "$ref": "#/definitions/async-select-api-object" }
+        { "$ref": "#/definitions/async-api-string" },
+        { "$ref": "#/definitions/async-api-object" }
       ],
       "properties": {
         "type": {
@@ -134,7 +157,49 @@
       },
       "required": ["type", "api"]
     },
-    "async-select-api-string": {
+    "radio-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "radio"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/option-field"
+          }
+        }
+      },
+      "required": ["type", "options"]
+    },
+    "async-radio-field": {
+      "type": "object",
+      "anyOf": [
+        { "$ref": "#/definitions/async-api-string" },
+        { "$ref": "#/definitions/async-api-object" }
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "async-radio"
+        }
+      },
+      "required": ["type", "api"]
+    },
+    "option-field": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": ["value", "label"]
+    },
+    "async-api-string": {
       "type": "object",
       "properties": {
         "api": {
@@ -142,7 +207,7 @@
         }
       }
     },
-    "async-select-api-object": {
+    "async-api-object": {
       "type": "object",
       "properties": {
         "api": {
@@ -156,6 +221,51 @@
             }
           },
           "required": ["url", "params"]
+        }
+      }
+    },
+    "number-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "number"
+        },
+        "minLength": {
+          "type": "number"
+        },
+        "maxLength": {
+          "type": "number"
+        }
+      },
+      "required": ["type"]
+    },
+    "mobile-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "mobile"
+        }
+      },
+      "required": ["type"]
+    },
+    "date-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "date"
+        }
+      },
+      "required": ["type"]
+    },
+    "checkbox-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "checkbox"
         }
       }
     }

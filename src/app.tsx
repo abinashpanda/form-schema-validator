@@ -1,15 +1,24 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { Button, Empty } from 'antd'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Button, Switch } from 'antd'
 import { SaveOutlined } from '@ant-design/icons'
 import Editor, { Monaco } from '@monaco-editor/react'
-import { HiExclamation } from 'react-icons/hi'
-import type { editor } from 'monaco-editor'
+import type { editor, IDisposable } from 'monaco-editor'
 import validationSchema from 'schemas/validation-schema.json'
 import logo from 'assets/logo.svg'
+import usePersistedState from 'hooks/use-persisted-state'
+import Ajv from 'ajv'
+import EditorErrors from 'components/editor-errors'
+import FormPreview from 'components/form-preview'
+import { ServiceSchema } from 'types/form'
+import { useLanguageContext } from 'hooks/use-language'
+
+const ajv = new Ajv()
+const ajvValidator = ajv.compile(validationSchema)
 
 export default function App() {
   // @TODO: use usePersistedState to persist the state in local storage
-  const [content, setContent] = useState(
+  const [content, setContent] = usePersistedState(
+    'form-schema',
     JSON.stringify(
       {
         id: 'service-id',
@@ -29,6 +38,9 @@ export default function App() {
     ),
   )
 
+  const editor = useRef<editor.IEditor | null>(null)
+  const [markers, setMarkers] = useState<editor.IMarker[]>([])
+
   const handleBeforeMount = useCallback((monaco: Monaco) => {
     monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
@@ -42,53 +54,54 @@ export default function App() {
     })
   }, [])
 
-  const editor = useRef<editor.IEditor | null>(null)
-  const [markers, setMarkers] = useState<editor.IMarker[]>([])
+  const markerChangeDisposable = useRef<IDisposable | null>(null)
+
   const handleEditorMount = useCallback(
     (_editor: editor.IEditor, monaco: Monaco) => {
       editor.current = _editor
-      // @TODO: Dispose markers when unmounting the editor
-      monaco.editor.onDidChangeMarkers(([uri]) => {
-        setMarkers(monaco.editor.getModelMarkers({ resource: uri }))
+      markerChangeDisposable.current = monaco.editor.onDidChangeMarkers(
+        ([uri]) => {
+          setMarkers(monaco.editor.getModelMarkers({ resource: uri }))
+        },
+      )
+    },
+    [],
+  )
+
+  useEffect(function disposeMarkerChangeListener() {
+    return () => {
+      markerChangeDisposable.current?.dispose()
+    }
+  }, [])
+
+  const handleErrorClick = useCallback(
+    ({ lineNumber, column }: { lineNumber: number; column: number }) => {
+      editor.current?.setPosition({
+        lineNumber,
+        column,
+      })
+      editor.current?.focus()
+      editor.current?.revealPosition({
+        lineNumber,
+        column,
       })
     },
     [],
   )
 
-  const markersContent = useMemo(() => {
-    if (markers.length === 0) {
-      return (
-        <div className="flex h-full items-center justify-center">
-          <Empty description="No errors found" />
-        </div>
-      )
+  const validatedFormSchema = useMemo(() => {
+    try {
+      const parsedData = JSON.parse(content)
+      if (ajvValidator(parsedData)) {
+        return parsedData as ServiceSchema
+      }
+      return undefined
+    } catch (error) {
+      return undefined
     }
+  }, [content])
 
-    return (
-      <div className="p-2">
-        {markers.map(({ message, startColumn, startLineNumber }) => {
-          return (
-            <button
-              key={`${message}-${startColumn}-${startLineNumber}`}
-              className="flex items-center space-x-2 p-1 text-sm"
-              onClick={() => {
-                editor.current?.setPosition({
-                  lineNumber: startLineNumber,
-                  column: startColumn,
-                })
-                editor.current?.focus()
-              }}
-            >
-              <HiExclamation className="h-4 w-4 text-yellow-500" />
-              <div>
-                {message} [Ln {startLineNumber}, Col {startColumn}]
-              </div>
-            </button>
-          )
-        })}
-      </div>
-    )
-  }, [markers])
+  const { language, setLanguage } = useLanguageContext()
 
   return (
     <>
@@ -99,14 +112,28 @@ export default function App() {
             Form Schema Validator
           </div>
           <div className="flex-1" />
-          <Button className="ml-4" type="primary" icon={<SaveOutlined />}>
+          <label htmlFor="language" className="mr-2 text-right capitalize">
+            {language}
+          </label>
+          <Switch
+            className="!mr-8"
+            checked={language === 'hindi'}
+            onChange={(value) => {
+              if (value) {
+                setLanguage('hindi')
+              } else {
+                setLanguage('english')
+              }
+            }}
+          />
+          <Button type="primary" icon={<SaveOutlined />}>
             Save Form
           </Button>
         </div>
       </div>
-      <div className="flex h-screen flex-col pt-16">
+      <div className="flex h-screen flex-col overflow-hidden pt-16">
         <div className="grid h-full grid-cols-2 overflow-hidden">
-          <div className="flex flex-col border-r">
+          <div className="flex flex-col overflow-hidden border-r">
             <div className="flex-1 border-b">
               <Editor
                 language="json"
@@ -117,12 +144,24 @@ export default function App() {
                 }}
                 beforeMount={handleBeforeMount}
                 onMount={handleEditorMount}
+                options={{
+                  formatOnPaste: true,
+                  formatOnType: true,
+                }}
               />
             </div>
-            <div className="h-40 overflow-auto">{markersContent}</div>
+            <EditorErrors
+              className="h-40"
+              errors={markers}
+              onErrorClick={handleErrorClick}
+            />
           </div>
           {/** @TODO: Check for uniqueness among fields and forms */}
-          <div />
+          <div className="overflow-auto">
+            {validatedFormSchema ? (
+              <FormPreview schema={validatedFormSchema} />
+            ) : null}
+          </div>
         </div>
       </div>
     </>
