@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "/",
+  "title": "Form Validation Schema",
+  "description": "Schema for creating custom forms",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the service"
+    },
+    "nameEnglish": {
+      "type": "string",
+      "description": "Name of the service in English"
+    },
+    "nameHindi": {
+      "type": "string",
+      "description": "Name of the service in Hindi"
+    },
+    "forms": {
+      "type": "array",
+      "description": "Array of forms",
+      "items": {
+        "$ref": "#/definitions/form"
+      }
+    }
+  },
+  "required": ["id", "nameEnglish", "nameHindi"],
+  "definitions": {
+    "form": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the form"
+        },
+        "nameEnglish": {
+          "type": "string",
+          "description": "Name of the form in English"
+        },
+        "nameHindi": {
+          "type": "string",
+          "description": "Name of the form in Hindi"
+        },
+        "fields": {
+          "description": "Array of fields present in the form",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/field"
+          }
+        }
+      },
+      "required": ["id", "nameEnglish", "nameHindi"]
+    },
+    "field": {
+      "type": "object",
+      "anyOf": [
+        { "$ref": "#/definitions/text-field" },
+        { "$ref": "#/definitions/name-field" },
+        { "$ref": "#/definitions/image-uploader-field" },
+        { "$ref": "#/definitions/async-select-field" }
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the field"
+        },
+        "nameEnglish": {
+          "type": "string",
+          "description": "Name of the field in English"
+        },
+        "nameHindi": {
+          "type": "string",
+          "description": "Name of the field in Hindi"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the field is required or not"
+        }
+      },
+      "required": ["id", "nameEnglish", "nameHindi"]
+    },
+    "text-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "text"
+        },
+        "minLength": {
+          "type": "number"
+        },
+        "maxLength": {
+          "type": "number"
+        }
+      },
+      "required": ["type"]
+    },
+    "name-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "name"
+        },
+        "saluation": {
+          "type": "string",
+          "enum": ["formal", "relation"]
+        }
+      },
+      "required": ["type", "saluation"]
+    },
+    "image-uploader-field": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "image-uploader"
+        }
+      },
+      "required": ["type"]
+    },
+    "async-select-field": {
+      "type": "object",
+      "anyOf": [
+        { "$ref": "#/definitions/async-select-api-string" },
+        { "$ref": "#/definitions/async-select-api-object" }
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "async-select"
+        }
+      },
+      "required": ["type", "api"]
+    },
+    "async-select-api-string": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        }
+      }
+    },
+    "async-select-api-object": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string"
+            },
+            "params": {
+              "type": "object"
+            }
+          },
+          "required": ["url", "params"]
+        }
+      }
+    }
+  }
+}
