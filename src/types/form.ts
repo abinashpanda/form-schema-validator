@@ -73,6 +73,10 @@ export type MobileField = {
   type: 'mobile'
 }
 
+export type DateField = {
+  type: 'date'
+}
+
 export type FieldSchema = BaseFieldSchema &
   (
     | TextField
@@ -85,4 +89,5 @@ export type FieldSchema = BaseFieldSchema &
     | AsyncSelectField
     | AsyncRadioField
     | MobileField
+    | DateField
   )

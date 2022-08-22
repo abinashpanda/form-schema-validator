@@ -1,5 +1,14 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Checkbox, Form, Input, InputNumber, Radio, Select, Upload } from 'antd'
+import {
+  Checkbox,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  Upload,
+} from 'antd'
 import type { Rule } from 'antd/lib/form'
 import clsx from 'clsx'
 import AsyncSelect from 'components/async-select'
@@ -229,6 +238,19 @@ export default function SubformPreview({
                     minLength={10}
                     maxLength={10}
                   />
+                </Form.Item>
+              )
+            }
+
+            case 'date': {
+              return (
+                <Form.Item
+                  key={field.id}
+                  name={field.id}
+                  label={formLabel}
+                  rules={rules}
+                >
+                  <DatePicker className="!w-full" />
                 </Form.Item>
               )
             }
