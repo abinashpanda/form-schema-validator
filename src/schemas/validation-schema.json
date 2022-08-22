@@ -190,14 +190,17 @@
     "option-field": {
       "type": "object",
       "properties": {
-        "value": {
+        "_id": {
           "type": "string"
         },
-        "label": {
+        "nameEnglish": {
+          "type": "string"
+        },
+        "nameHindi": {
           "type": "string"
         }
       },
-      "required": ["value", "label"]
+      "required": ["_id", "nameEnglish", "nameHindi"]
     },
     "async-api-string": {
       "type": "object",
