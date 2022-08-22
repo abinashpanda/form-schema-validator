@@ -216,6 +216,23 @@ export default function SubformPreview({
               )
             }
 
+            case 'mobile': {
+              return (
+                <Form.Item
+                  key={field.id}
+                  name={field.id}
+                  label={formLabel}
+                  rules={rules}
+                >
+                  <InputNumber
+                    className="!w-full"
+                    minLength={10}
+                    maxLength={10}
+                  />
+                </Form.Item>
+              )
+            }
+
             default: {
               return null
             }

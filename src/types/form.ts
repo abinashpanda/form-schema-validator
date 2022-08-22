@@ -69,6 +69,10 @@ export type AsyncRadioField = {
   api: AsyncApi
 }
 
+export type MobileField = {
+  type: 'mobile'
+}
+
 export type FieldSchema = BaseFieldSchema &
   (
     | TextField
@@ -80,4 +84,5 @@ export type FieldSchema = BaseFieldSchema &
     | CheckboxField
     | AsyncSelectField
     | AsyncRadioField
+    | MobileField
   )
