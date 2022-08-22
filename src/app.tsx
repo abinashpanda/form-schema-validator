@@ -137,7 +137,6 @@ export default function App() {
             <div className="flex-1 border-b">
               <Editor
                 language="json"
-                theme="vs-dark"
                 value={content}
                 onChange={(value) => {
                   setContent(value ?? '')
@@ -147,6 +146,7 @@ export default function App() {
                 options={{
                   formatOnPaste: true,
                   formatOnType: true,
+                  fontSize: 13,
                 }}
               />
             </div>
