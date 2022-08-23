@@ -7,6 +7,7 @@ import { ServiceSchema } from 'types/form'
 import Editor from 'components/editor'
 import { useOutletContext } from 'react-router-dom'
 import { compileSchema } from 'utils/schema'
+import { useAuthContext } from 'hooks/use-auth'
 
 const INITIAL_DATA = JSON.stringify(
   {
@@ -27,6 +28,8 @@ const INITIAL_DATA = JSON.stringify(
 )
 
 export default function NewEditor() {
+  const editor = useRef<{ formatContent: () => void }>(null)
+
   const [content, setContent] = usePersistedState('form-schema', INITIAL_DATA)
 
   const [validatedSchema, setValidatedSchema] = useState<
@@ -40,7 +43,7 @@ export default function NewEditor() {
     }
   }, [content])
 
-  const editor = useRef<{ formatContent: () => void }>(null)
+  const { user } = useAuthContext()
 
   const { setNavbarContent } = useOutletContext<{
     setNavbarContent: React.Dispatch<React.SetStateAction<React.ReactNode>>
@@ -64,13 +67,13 @@ export default function NewEditor() {
           >
             Compile
           </Button>
-          <Button type="primary" icon={<SaveOutlined />}>
+          <Button type="primary" icon={<SaveOutlined />} disabled={!user}>
             Save Form
           </Button>
         </>,
       )
     },
-    [handleCompileSchema, setNavbarContent],
+    [handleCompileSchema, setNavbarContent, user],
   )
 
   return (

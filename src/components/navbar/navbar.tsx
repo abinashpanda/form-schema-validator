@@ -1,7 +1,10 @@
-import { Switch } from 'antd'
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
+import { Avatar, Dropdown, Menu, Spin, Switch } from 'antd'
 import logo from 'assets/logo.svg'
 import clsx from 'clsx'
+import { useAuthContext } from 'hooks/use-auth'
 import { useLanguageContext } from 'hooks/use-language'
+import { useMemo } from 'react'
 
 type NavbarProps = {
   children?: React.ReactNode
@@ -11,6 +14,41 @@ type NavbarProps = {
 
 export default function Navbar({ children, className, style }: NavbarProps) {
   const { language, setLanguage } = useLanguageContext()
+
+  const { authVerified, user, signInWithGoogle, signOut } = useAuthContext()
+  const userContent = useMemo(() => {
+    if (!authVerified) {
+      return <Spin />
+    }
+
+    if (user) {
+      return (
+        <Dropdown
+          trigger={['click']}
+          placement="bottomRight"
+          overlay={
+            <Menu className="w-40">
+              <Menu.Item disabled>{user?.displayName ?? user?.email}</Menu.Item>
+              <Menu.Divider />
+              <Menu.Item icon={<LogoutOutlined />} onClick={signOut}>
+                Logout
+              </Menu.Item>
+            </Menu>
+          }
+        >
+          <Avatar src={user.photoURL} className="cursor-pointer">
+            {user.displayName?.[0]}
+          </Avatar>
+        </Dropdown>
+      )
+    }
+
+    return (
+      <button onClick={signInWithGoogle}>
+        <Avatar icon={<UserOutlined />} />
+      </button>
+    )
+  }, [authVerified, user, signInWithGoogle])
 
   return (
     <div
@@ -42,6 +80,7 @@ export default function Navbar({ children, className, style }: NavbarProps) {
           }}
         />
         {children}
+        <div className="ml-4">{userContent}</div>
       </div>
     </div>
   )

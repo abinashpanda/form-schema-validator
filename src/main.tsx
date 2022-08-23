@@ -6,15 +6,18 @@ import { QueryClientProvider } from 'react-query'
 import { queryClient } from 'utils/client'
 import { LanguageProvider } from 'hooks/use-language'
 import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from 'hooks/use-auth'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <App />
-        </LanguageProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <LanguageProvider>
+            <App />
+          </LanguageProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </AuthProvider>
   </React.StrictMode>,
 )
