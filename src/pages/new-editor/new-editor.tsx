@@ -8,6 +8,7 @@ import Editor from 'components/editor'
 import { useOutletContext } from 'react-router-dom'
 import { compileSchema } from 'utils/schema'
 import { useAuthContext } from 'hooks/use-auth'
+import SaveNewFormModal from 'components/save-new-form-modal'
 
 const INITIAL_DATA = JSON.stringify(
   {
@@ -67,13 +68,15 @@ export default function NewEditor() {
           >
             Compile
           </Button>
-          <Button type="primary" icon={<SaveOutlined />} disabled={!user}>
-            Save Form
-          </Button>
+          <SaveNewFormModal content={content}>
+            <Button type="primary" icon={<SaveOutlined />} disabled={!user}>
+              Save Form
+            </Button>
+          </SaveNewFormModal>
         </>,
       )
     },
-    [handleCompileSchema, setNavbarContent, user],
+    [handleCompileSchema, setNavbarContent, user, content],
   )
 
   return (
