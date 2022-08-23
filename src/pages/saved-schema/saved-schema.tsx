@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Badge, Button, message, Modal, Spin } from 'antd'
-import { CodeOutlined, SaveOutlined } from '@ant-design/icons'
+import { CodeOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
 import FormPreview from 'components/form-preview'
 import { ServiceSchema } from 'types/form'
 import Editor from 'components/editor'
-import { useMatch, useOutletContext } from 'react-router-dom'
+import { useMatch, useNavigate, useOutletContext } from 'react-router-dom'
 import { compileSchema } from 'utils/schema'
 import { useAuthContext } from 'hooks/use-auth'
-import { useQuery } from 'react-query'
-import { getForm } from 'queries/form'
+import { useMutation, useQuery } from 'react-query'
+import { deleteForm, getForm } from 'queries/form'
 import { FirestoreError } from 'firebase/firestore'
 import ReactRouterPrompt from 'react-router-prompt'
 import UpdateFormModal from 'components/update-form-modal'
@@ -54,6 +54,17 @@ export default function SavedSchema() {
 
   const { user } = useAuthContext()
 
+  const navigate = useNavigate()
+  const { isLoading: isDeleting, mutate: deleteFormMutation } = useMutation(
+    deleteForm,
+    {
+      onSuccess: () => {
+        message.success('Form deleted successfully')
+        navigate('/', { replace: true })
+      },
+    },
+  )
+
   const { setNavbarContent } = useOutletContext<{
     setNavbarContent: React.Dispatch<React.SetStateAction<React.ReactNode>>
   }>()
@@ -75,6 +86,23 @@ export default function SavedSchema() {
             className="mr-4"
           >
             Compile
+          </Button>
+          <Button
+            icon={<DeleteOutlined />}
+            danger
+            className="mr-4"
+            onClick={() => {
+              Modal.confirm({
+                title: 'Are you sure you want to delete this form?',
+                content: 'Form once deleted cannot be recovered',
+                onOk: () => {
+                  deleteFormMutation(schemaId)
+                },
+              })
+            }}
+            loading={isDeleting}
+          >
+            Delete
           </Button>
           <Badge dot={hasUnsavedChanges}>
             <UpdateFormModal
@@ -98,6 +126,8 @@ export default function SavedSchema() {
       content,
       savedSchema,
       hasUnsavedChanges,
+      isDeleting,
+      deleteFormMutation,
     ],
   )
 

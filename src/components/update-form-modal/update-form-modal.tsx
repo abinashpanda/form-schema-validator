@@ -2,7 +2,8 @@ import { Form, Input, message, Modal } from 'antd'
 import { FirestoreError } from 'firebase/firestore'
 import { updateForm } from 'queries/form'
 import { cloneElement, useCallback, useState } from 'react'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
+import { SavedSchema } from 'types/form'
 
 type UpdateFormModalProps = {
   children: React.ReactElement<{ onClick: () => void }>
@@ -21,9 +22,11 @@ export default function UpdateFormModal({
 
   const [form] = Form.useForm()
 
+  const queryClient = useQueryClient()
   const { mutate: updateFormMutation, isLoading } = useMutation(updateForm, {
-    onSuccess: () => {
+    onSuccess: (data) => {
       setModalVisible(false)
+      queryClient.setQueryData<SavedSchema>(['saved-schema', id], data)
     },
     onError: (error: FirestoreError) => {
       message.error(error.message)
