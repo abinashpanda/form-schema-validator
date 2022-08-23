@@ -22,6 +22,7 @@ export default function SaveNewFormModal({
     onSuccess: () => {
       setModalVisible(false)
       form.resetFields()
+      message.success('Form saved successfully')
     },
     onError: (error: FirestoreError) => {
       message.error(error.message)

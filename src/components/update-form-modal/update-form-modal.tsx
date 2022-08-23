@@ -27,6 +27,7 @@ export default function UpdateFormModal({
     onSuccess: (data) => {
       setModalVisible(false)
       queryClient.setQueryData<SavedSchema>(['saved-schema', id], data)
+      message.success('Form updated successfully')
     },
     onError: (error: FirestoreError) => {
       message.error(error.message)
