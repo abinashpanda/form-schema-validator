@@ -1,5 +1,9 @@
-import { Form, Input, Modal } from 'antd'
+import { Form, Input, message, Modal } from 'antd'
+import { FirestoreError } from 'firebase/firestore'
+import { useAuthContext } from 'hooks/use-auth'
+import { createForm } from 'queries/form'
 import { cloneElement, useCallback, useState } from 'react'
+import { useMutation } from 'react-query'
 
 type SaveNewFormModalProps = {
   children: React.ReactElement<{ onClick: () => void }>
@@ -14,11 +18,22 @@ export default function SaveNewFormModal({
 
   const [form] = Form.useForm()
 
+  const { mutate: createFormMutation, isLoading } = useMutation(createForm, {
+    onSuccess: () => {
+      setModalVisible(false)
+      form.resetFields()
+    },
+    onError: (error: FirestoreError) => {
+      message.error(error.message)
+    },
+  })
+
+  const { user } = useAuthContext()
   const handleFinish = useCallback(
     ({ name }: { name: string }) => {
-      console.log({ name, content })
+      createFormMutation({ name, content, user: user!.uid })
     },
-    [content],
+    [content, createFormMutation, user],
   )
 
   return (
@@ -37,6 +52,9 @@ export default function SaveNewFormModal({
         }}
         onOk={() => {
           form.submit()
+        }}
+        okButtonProps={{
+          loading: isLoading,
         }}
       >
         <Form layout="vertical" form={form} onFinish={handleFinish}>

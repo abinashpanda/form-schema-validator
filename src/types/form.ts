@@ -91,3 +91,10 @@ export type FieldSchema = BaseFieldSchema &
     | MobileField
     | DateField
   )
+
+export type SavedSchema = {
+  name: string
+  content: string
+  user: string
+  id: string
+}

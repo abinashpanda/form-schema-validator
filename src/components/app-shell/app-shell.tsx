@@ -1,11 +1,14 @@
 import clsx from 'clsx'
 import Navbar from 'components/navbar'
 import { useState } from 'react'
-import { HiOutlineDocumentAdd } from 'react-icons/hi'
+import { HiOutlineDocument, HiOutlineDocumentAdd } from 'react-icons/hi'
 import { NavLink, Outlet } from 'react-router-dom'
+import { useUserDataContext } from 'use-user-data'
 
 export default function AppShell() {
   const [navbarContent, setNavbarContent] = useState<React.ReactNode>()
+
+  const { savedSchemas } = useUserDataContext()
 
   return (
     <>
@@ -24,6 +27,21 @@ export default function AppShell() {
             <HiOutlineDocumentAdd className="h-5 w-5 flex-shrink-0" />
             <span className="flex-1 truncate">New Schema</span>
           </NavLink>
+          {savedSchemas.map((schema) => (
+            <NavLink
+              key={schema.id}
+              to={`/schema/${schema.id}`}
+              className={({ isActive }) =>
+                clsx(
+                  'flex w-full items-center space-x-2 rounded px-2 py-1',
+                  isActive ? 'bg-blue-50 text-blue-500' : undefined,
+                )
+              }
+            >
+              <HiOutlineDocument className="h-5 w-5 flex-shrink-0" />
+              <span className="flex-1 truncate">{schema.name}</span>
+            </NavLink>
+          ))}
         </div>
       </div>
       <div className="h-screen overflow-hidden pt-16 pl-[240px]">
