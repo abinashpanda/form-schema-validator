@@ -90,7 +90,20 @@ export default function NewEditor() {
         />
         {/** @TODO: Check for uniqueness among fields and forms */}
         <div className="overflow-auto">
-          {validatedSchema ? <FormPreview schema={validatedSchema} /> : null}
+          {validatedSchema ? (
+            <FormPreview schema={validatedSchema} />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                Form not yet compiled. <br /> Click on{' '}
+                <span className="inline-flex space-x-1 rounded border px-2 py-1 font-mono text-xs font-bold">
+                  <CodeOutlined />
+                  <span>Compile</span>
+                </span>{' '}
+                button
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

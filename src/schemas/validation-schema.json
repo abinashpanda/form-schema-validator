@@ -50,7 +50,7 @@
           }
         }
       },
-      "required": ["id", "nameEnglish", "nameHindi"]
+      "required": ["id", "nameEnglish", "nameHindi", "fields"]
     },
     "field": {
       "type": "object",
@@ -85,7 +85,7 @@
           "description": "Whether the field is required or not"
         }
       },
-      "required": ["id", "nameEnglish", "nameHindi"]
+      "required": ["id", "nameEnglish", "nameHindi", "type"]
     },
     "text-field": {
       "type": "object",
